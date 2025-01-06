@@ -16,6 +16,7 @@ import { Bar, Pie, Line } from 'react-chartjs-2';
 import type { PostData } from '../types/PostData';
 import { TrendingUp, Users, Eye, Share2, MessageCircle, ThumbsUp } from 'lucide-react';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { motion } from 'framer-motion';
 
 ChartJS.register(
   CategoryScale,
@@ -326,14 +327,35 @@ export default function Dashboard() {
     offset: 20,
   };
 
-  if (isLoading) {
-    return (
-      <div className="p-6 pt-24 max-w-6xl mx-auto">
-        <div className="text-center">
-          <p className="text-xl">Loading dashboard data...</p>
-        </div>
+  const fadeInUp = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.5 }
+  };
+
+  const staggerContainer = {
+    animate: {
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const LoadingAnimation = () => (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="p-6 pt-24 max-w-6xl mx-auto"
+    >
+      <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin" />
+        <p className="text-xl text-gray-600">Loading dashboard data...</p>
       </div>
-    );
+    </motion.div>
+  );
+
+  if (isLoading) {
+    return <LoadingAnimation />;
   }
 
   if (error) {
@@ -347,196 +369,242 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="p-6 pt-24 max-w-7xl mx-auto bg-gray-50">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-          Social Media Analytics Dashboard
-        </h1>
-        <div className="text-sm text-gray-600">
-          Last updated: {new Date().toLocaleDateString()}
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className={`${cardStyle} bg-white p-6 rounded-xl shadow`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-1">Total Engagement</h2>
-              <p className="text-3xl font-bold text-green-600">{totalEngagement.toLocaleString()}</p>
-            </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <TrendingUp className="w-6 h-6 text-green-600" />
-            </div>
+    <div className="p-6 pt-24 max-w-7xl mx-auto bg-gray-50 min-h-screen overflow-auto">
+      <motion.div
+        initial="initial"
+        animate="animate"
+        variants={staggerContainer}
+        className="space-y-8"
+      >
+        <motion.div 
+          variants={fadeInUp}
+          className="flex items-center justify-between mb-8"
+        >
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+            Social Media Analytics Dashboard
+          </h1>
+          <div className="text-sm text-gray-600">
+            Last updated: {new Date().toLocaleDateString()}
           </div>
-          <p className="text-sm text-gray-500 mt-2">
-            {`${avgEngagement.toFixed(1)}% avg. engagement rate`}
-          </p>
-        </div>
+        </motion.div>
+        
+        <motion.div 
+          variants={fadeInUp}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        >
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className={`${cardStyle} bg-white p-6 rounded-xl shadow transition-all duration-300`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-700 mb-1">Total Engagement</h2>
+                <p className="text-3xl font-bold text-green-600">{totalEngagement.toLocaleString()}</p>
+              </div>
+              <div className="p-3 bg-green-100 rounded-full">
+                <TrendingUp className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+            <p className="text-sm text-gray-500 mt-2">
+              {`${avgEngagement.toFixed(1)}% avg. engagement rate`}
+            </p>
+          </motion.div>
 
-        <div className={`${cardStyle} bg-white p-6 rounded-xl shadow`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-1">Total Views</h2>
-              <p className="text-3xl font-bold text-blue-600">{totalViews.toLocaleString()}</p>
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className={`${cardStyle} bg-white p-6 rounded-xl shadow transition-all duration-300`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-700 mb-1">Total Views</h2>
+                <p className="text-3xl font-bold text-blue-600">{totalViews.toLocaleString()}</p>
+              </div>
+              <div className="p-3 bg-blue-100 rounded-full">
+                <Eye className="w-6 h-6 text-blue-600" />
+              </div>
             </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <Eye className="w-6 h-6 text-blue-600" />
-            </div>
-          </div>
-          <p className="text-sm text-gray-500 mt-2">
-            {`${(totalViews / data.length).toFixed(0)} avg. views per post`}
-          </p>
-        </div>
+            <p className="text-sm text-gray-500 mt-2">
+              {`${(totalViews / data.length).toFixed(0)} avg. views per post`}
+            </p>
+          </motion.div>
 
-        <div className={`${cardStyle} bg-white p-6 rounded-xl shadow`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-1">Total Likes</h2>
-              <p className="text-3xl font-bold text-purple-600">{totalLikes.toLocaleString()}</p>
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className={`${cardStyle} bg-white p-6 rounded-xl shadow transition-all duration-300`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-700 mb-1">Total Likes</h2>
+                <p className="text-3xl font-bold text-purple-600">{totalLikes.toLocaleString()}</p>
+              </div>
+              <div className="p-3 bg-purple-100 rounded-full">
+                <ThumbsUp className="w-6 h-6 text-purple-600" />
+              </div>
             </div>
-            <div className="p-3 bg-purple-100 rounded-full">
-              <ThumbsUp className="w-6 h-6 text-purple-600" />
-            </div>
-          </div>
-          <p className="text-sm text-gray-500 mt-2">
-            {`${(totalLikes / data.length).toFixed(0)} avg. likes per post`}
-          </p>
-        </div>
-      </div>
+            <p className="text-sm text-gray-500 mt-2">
+              {`${(totalLikes / data.length).toFixed(0)} avg. likes per post`}
+            </p>
+          </motion.div>
+        </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className={`${cardStyle} bg-white p-6 rounded-xl shadow`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-1">Total Shares</h2>
-              <p className="text-3xl font-bold text-indigo-600">{totalShares.toLocaleString()}</p>
+        <motion.div 
+          variants={fadeInUp}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        >
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className={`${cardStyle} bg-white p-6 rounded-xl shadow transition-all duration-300`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-700 mb-1">Total Shares</h2>
+                <p className="text-3xl font-bold text-indigo-600">{totalShares.toLocaleString()}</p>
+              </div>
+              <div className="p-3 bg-indigo-100 rounded-full">
+                <Share2 className="w-6 h-6 text-indigo-600" />
+              </div>
             </div>
-            <div className="p-3 bg-indigo-100 rounded-full">
-              <Share2 className="w-6 h-6 text-indigo-600" />
-            </div>
-          </div>
-        </div>
+          </motion.div>
 
-        <div className={`${cardStyle} bg-white p-6 rounded-xl shadow`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-1">Total Comments</h2>
-              <p className="text-3xl font-bold text-orange-600">{totalComments.toLocaleString()}</p>
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className={`${cardStyle} bg-white p-6 rounded-xl shadow transition-all duration-300`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-700 mb-1">Total Comments</h2>
+                <p className="text-3xl font-bold text-orange-600">{totalComments.toLocaleString()}</p>
+              </div>
+              <div className="p-3 bg-orange-100 rounded-full">
+                <MessageCircle className="w-6 h-6 text-orange-600" />
+              </div>
             </div>
-            <div className="p-3 bg-orange-100 rounded-full">
-              <MessageCircle className="w-6 h-6 text-orange-600" />
-            </div>
-          </div>
-        </div>
+          </motion.div>
 
-        <div className={`${cardStyle} bg-white p-6 rounded-xl shadow`}>
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-1">Audience Reach</h2>
-              <p className="text-3xl font-bold text-teal-600">
-                {(totalViews + totalEngagement).toLocaleString()}
-              </p>
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className={`${cardStyle} bg-white p-6 rounded-xl shadow transition-all duration-300`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-700 mb-1">Audience Reach</h2>
+                <p className="text-3xl font-bold text-teal-600">
+                  {(totalViews + totalEngagement).toLocaleString()}
+                </p>
+              </div>
+              <div className="p-3 bg-teal-100 rounded-full">
+                <Users className="w-6 h-6 text-teal-600" />
+              </div>
             </div>
-            <div className="p-3 bg-teal-100 rounded-full">
-              <Users className="w-6 h-6 text-teal-600" />
-            </div>
-          </div>
-        </div>
-      </div>
+          </motion.div>
+        </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <div className={`${cardStyle} bg-white p-6 rounded-xl shadow`}>
-          <h2 className="text-xl font-semibold mb-4 text-gray-700">Content Performance</h2>
-          <Bar 
-            data={postTypeData} 
-            options={{
-              ...chartOptions,
-              plugins: {
-                ...chartOptions.plugins,
-                title: {
-                  ...chartOptions.plugins.title,
-                  text: 'Posts by Type'
+        <motion.div 
+          variants={fadeInUp}
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+        >
+          <motion.div
+            whileHover={{ scale: 1.01 }}
+            className={`${cardStyle} bg-white p-6 rounded-xl shadow`}
+          >
+            <h2 className="text-xl font-semibold mb-4 text-gray-700">Content Performance</h2>
+            <Bar data={postTypeData} options={barChartOptions} />
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.01 }}
+            className={`${cardStyle} bg-white p-6 rounded-xl shadow`}
+          >
+            <h2 className="text-xl font-semibold mb-4 text-gray-700">Engagement Distribution</h2>
+            <Pie 
+              data={{
+                labels: engagementByType.labels,
+                datasets: [{
+                  data: engagementByType.datasets[0].data,
+                  backgroundColor: chartColors.primary,
+                  borderColor: chartColors.borders,
+                  borderWidth: 3,
+                  hoverOffset: 30,
+                  hoverBorderWidth: 4,
+                  offset: 10,
+                  spacing: 5,
+                }]
+              }}
+              options={pieChartOptions}
+            />
+          </motion.div>
+        </motion.div>
+
+        <motion.div 
+          variants={fadeInUp}
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+        >
+          <motion.div
+            whileHover={{ scale: 1.01 }}
+            className={`${cardStyle} bg-white p-6 rounded-xl shadow`}
+          >
+            <h2 className="text-xl font-semibold mb-4 text-gray-700">Daily Performance</h2>
+            <Line 
+              data={{
+                labels: engagementByDay.labels,
+                datasets: [{
+                  label: 'Engagement',
+                  data: engagementByDay.datasets[0].data,
+                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                  borderColor: 'rgba(75, 192, 192, 1)',
+                  borderWidth: 3,
+                  tension: 0.4,
+                  fill: true,
+                  pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                  pointBorderColor: '#fff',
+                  pointBorderWidth: 2,
+                  pointRadius: 6,
+                  pointHoverRadius: 8,
+                  pointHoverBackgroundColor: 'rgba(75, 192, 192, 1)',
+                  pointHoverBorderWidth: 2
+                }]
+              }}
+              options={{
+                ...lineChartOptions,
+                plugins: {
+                  ...lineChartOptions.plugins,
+                  datalabels: {
+                    display: false
+                  }
                 }
-              }
-            }} 
-          />
-        </div>
-        <div className={`${cardStyle} bg-white p-6 rounded-xl shadow`}>
-          <h2 className="text-xl font-semibold mb-4 text-gray-700">Engagement Distribution</h2>
-          <Pie 
-            data={{
-              labels: engagementByType.labels,
-              datasets: [{
-                data: engagementByType.datasets[0].data,
-                backgroundColor: chartColors.primary,
-                borderColor: chartColors.borders,
-                borderWidth: 3,
-                hoverOffset: 30,
-                hoverBorderWidth: 4,
-                offset: 10,
-                spacing: 5,
-              }]
-            }}
-            options={pieChartOptions}
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className={`${cardStyle} bg-white p-6 rounded-xl shadow`}>
-          <h2 className="text-xl font-semibold mb-4 text-gray-700">Daily Performance</h2>
-          <Line 
-            data={{
-              labels: engagementByDay.labels,
-              datasets: [{
-                label: 'Engagement',
-                data: engagementByDay.datasets[0].data,
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 3,
-                tension: 0.4,
-                fill: true,
-                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                pointHoverBackgroundColor: 'rgba(75, 192, 192, 1)',
-                pointHoverBorderWidth: 2
-              }]
-            }}
-            options={{
-              ...lineChartOptions,
-              plugins: {
-                ...lineChartOptions.plugins,
-                datalabels: {
-                  display: false
-                }
-              }
-            }}
-          />
-        </div>
-        <div className={`${cardStyle} bg-white p-6 rounded-xl shadow`}>
-          <h2 className="text-xl font-semibold mb-4 text-gray-700">Audience Demographics</h2>
-          <Bar 
-            data={{
-              labels: ageGroupDistribution.labels,
-              datasets: [{
-                label: 'Posts by Age Group',
-                data: ageGroupDistribution.datasets[0].data,
-                backgroundColor: chartColors.primary,
-                borderColor: chartColors.borders,
-                borderWidth: 2,
-                borderRadius: 8,
-                borderSkipped: false,
-                hoverBackgroundColor: chartColors.primary.map(color => color.replace('0.8', '1')),
-                hoverBorderWidth: 3,
-              }]
-            }}
-            options={barChartOptions}
-          />
-        </div>
-      </div>
+              }}
+            />
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.01 }}
+            className={`${cardStyle} bg-white p-6 rounded-xl shadow`}
+          >
+            <h2 className="text-xl font-semibold mb-4 text-gray-700">Audience Demographics</h2>
+            <Bar 
+              data={{
+                labels: ageGroupDistribution.labels,
+                datasets: [{
+                  label: 'Posts by Age Group',
+                  data: ageGroupDistribution.datasets[0].data,
+                  backgroundColor: chartColors.primary,
+                  borderColor: chartColors.borders,
+                  borderWidth: 2,
+                  borderRadius: 8,
+                  borderSkipped: false,
+                  hoverBackgroundColor: chartColors.primary.map(color => color.replace('0.8', '1')),
+                  hoverBorderWidth: 3,
+                }]
+              }}
+              options={barChartOptions}
+            />
+          </motion.div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 } 
